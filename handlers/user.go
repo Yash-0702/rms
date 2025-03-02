@@ -148,6 +148,14 @@ func GetAllUsersByAdminAndSubAdmin(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// check if users not exist return []
+	if len(users) == 0 {
+		utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+			"users": []string{},
+		})
+		return
+	}
+
 	// return the response
 	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
 		"users": users,
@@ -217,6 +225,14 @@ func GetAllAddress(res http.ResponseWriter, req *http.Request) {
 	address, addressErr := dbhelper.GetAllAddress(userId)
 	if addressErr != nil {
 		utils.ResponseError(res, http.StatusInternalServerError, addressErr, "failed to get address")
+		return
+	}
+
+	// check if address not exist return []
+	if len(address) == 0 {
+		utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+			"address": []string{},
+		})
 		return
 	}
 
@@ -305,6 +321,58 @@ func DeleteAddress(res http.ResponseWriter, req *http.Request) {
 	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
 		"message": "Address deleted successfully",
 	})
+}
+
+func CalculateDistance(res http.ResponseWriter, req *http.Request) {
+
+	// Decode the request body
+	var body models.DistanceRequest
+	if decodeErr := utils.DecodeJSONBody(req.Body, &body); decodeErr != nil {
+		utils.ResponseError(res, http.StatusBadRequest, decodeErr, "invalid request body")
+		return
+	}
+
+	// Validate the request body
+	v := validator.New()
+	if validationErr := v.Struct(&body); validationErr != nil {
+		utils.ResponseError(res, http.StatusBadRequest, validationErr, "validation error")
+		return
+	}
+
+	// get user id from context
+	userCtx := middlewares.UserContext(req)
+	userId := userCtx.UserId
+
+	// fmt.Println(userId)
+
+	// get user address
+	UserAddressCoordinates, UserAddressErr := dbhelper.GetUserCoordinates(userId, body.UserAddressId)
+	if UserAddressErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, UserAddressErr, "failed to get user address")
+		return
+	}
+
+	// get restaurant address
+	RestaurantAddressCoordinates, RestaurantAddressErr := dbhelper.GetRestaurantCoordinates(body.RestaurantAddressId)
+	if RestaurantAddressErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, RestaurantAddressErr, "failed to get restaurant address")
+		return
+	}
+
+	// calculate distance
+	distance, distanceErr := dbhelper.CalculateDistance(&UserAddressCoordinates, &RestaurantAddressCoordinates)
+	if distanceErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, distanceErr, "failed to calculate distance")
+		return
+	}
+
+	// return the response
+	utils.ResponseJSON(res, http.StatusOK, struct {
+		Distance float64 `json:"distance"`
+	}{distance})
+	// utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+	// 	"distance": distance,
+	// })
 }
 
 func LogoutUser(res http.ResponseWriter, req *http.Request) {

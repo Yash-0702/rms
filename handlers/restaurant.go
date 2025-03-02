@@ -55,6 +55,14 @@ func GetAllRestaurants(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// check if restaurants not exist return []
+	if len(restaurants) == 0 {
+		utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+			"restaurants": []string{},
+		})
+		return
+	}
+
 	// return the response
 	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
 		"restaurants": restaurants,

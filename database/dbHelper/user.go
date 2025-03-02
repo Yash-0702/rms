@@ -1,6 +1,7 @@
 package dbhelper
 
 import (
+	"fmt"
 	"rms/database"
 	"rms/models"
 	"rms/utils"
@@ -133,14 +134,32 @@ func AddAddress(userId string, address *models.AddAddress) error {
 
 func GetAllAddress(userId string) ([]models.GetAddress, error) {
 	var address []models.GetAddress
-	query := "SELECT id, address, latitude, longitude FROM address WHERE user_id = $1 AND archived_at IS NULL"
+	query := "SELECT id, address, latitude, longitude , user_id FROM address WHERE user_id = $1 AND archived_at IS NULL"
 	err := database.RMS.Select(&address, query, userId)
 	return address, err
 }
 
+func GetUserCoordinates(userId string, UserAddressId string) (models.UserAddressCoordinates, error) {
+	var coordinates models.UserAddressCoordinates
+	fmt.Println(UserAddressId)
+	query := "SELECT latitude, longitude FROM address WHERE user_id = $1 AND id = $2 AND archived_at IS NULL"
+	err := database.RMS.Get(&coordinates, query, userId, UserAddressId)
+	return coordinates, err
+}
+
+func CalculateDistance(userCoordinates *models.UserAddressCoordinates, RestaurtantCoordinates *models.RestaurantCoordinates) (float64, error) {
+
+	args := []interface{}{userCoordinates.Latitude, userCoordinates.Longitude, RestaurtantCoordinates.Latitude, RestaurtantCoordinates.Longitude}
+	query := "SELECT earth_distance(ll_to_earth($1, $2), ll_to_earth($3, $4))/1000 as distance_Km"
+	var distance float64
+	err := database.RMS.Get(&distance, query, args...)
+	return distance, err
+
+}
+
 func GetSpecificAddress(userId, addressId string) (models.GetAddress, error) {
 	var address models.GetAddress
-	query := "SELECT id, address, latitude, longitude FROM address WHERE user_id = $1 AND id = $2 AND archived_at IS NULL"
+	query := "SELECT id, address, latitude, longitude , user_id FROM address WHERE user_id = $1 AND id = $2 AND archived_at IS NULL"
 	err := database.RMS.Get(&address, query, userId, addressId)
 	return address, err
 }

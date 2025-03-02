@@ -71,6 +71,14 @@ func GetAllDishesFromAllRestaurants(res http.ResponseWriter, req *http.Request) 
 		return
 	}
 
+	// check if dishes not exist return []
+	if len(dishes) == 0 {
+		utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+			"dishes": []string{},
+		})
+		return
+	}
+
 	// return the response
 	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
 		"dishes": dishes,

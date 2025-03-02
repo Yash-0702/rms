@@ -108,7 +108,7 @@ func SetupRoutes() *Server {
 
 				user.Get("/all-restaurants", handlers.GetAllRestaurants)
 				user.Get("/all-dishes", handlers.GetAllDishesFromAllRestaurants)
-				// user.Get("/calculate-distance", handlers.CalculateDistance)
+				user.Get("/calculate-distance", handlers.CalculateDistance)
 
 				user.Route("/{restaurantId}", func(restaurantIDRoute chi.Router) {
 					restaurantIDRoute.Get("/", handlers.GetSpecificRestaurant)

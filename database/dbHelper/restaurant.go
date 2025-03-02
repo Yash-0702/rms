@@ -34,3 +34,10 @@ func GetSpecificRestaurant(id string) (models.Restaurant, error) {
 	err := database.RMS.Get(&restaurant, query, id)
 	return restaurant, err
 }
+
+func GetRestaurantCoordinates(restaurantId string) (models.RestaurantCoordinates, error) {
+	var coordinates models.RestaurantCoordinates
+	query := "SELECT latitude, longitude FROM restaurants WHERE id = $1 AND archived_at IS NULL"
+	err := database.RMS.Get(&coordinates, query, restaurantId)
+	return coordinates, err
+}

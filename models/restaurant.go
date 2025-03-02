@@ -17,3 +17,8 @@ type Restaurant struct {
 	CreatedAt string `json:"created_at" db:"created_at"`
 	CreatedBy string `json:"created_by" db:"created_by"`
 }
+
+type RestaurantCoordinates struct {
+	Latitude  float64 `json:"latitude" db:"latitude" validate:"required"`
+	Longitude float64 `json:"longitude" db:"longitude" validate:"required"`
+}

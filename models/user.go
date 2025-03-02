@@ -44,10 +44,21 @@ type GetAddress struct {
 	Address   string `json:"address" db:"address"`
 	Latitude  string `json:"latitude" db:"latitude"`
 	Longitude string `json:"longitude" db:"longitude"`
+	UserId    string `json:"user_id" db:"user_id"`
 }
 
 type UpdateAddress struct {
 	Address   string  `json:"address" db:"address" validate:"required"`
+	Latitude  float64 `json:"latitude" db:"latitude" validate:"required"`
+	Longitude float64 `json:"longitude" db:"longitude" validate:"required"`
+}
+
+type DistanceRequest struct {
+	UserAddressId       string `json:"user_address_id" db:"id" validate:"required"`
+	RestaurantAddressId string `json:"restaurant_address_id" db:"id" validate:"required"`
+}
+
+type UserAddressCoordinates struct {
 	Latitude  float64 `json:"latitude" db:"latitude" validate:"required"`
 	Longitude float64 `json:"longitude" db:"longitude" validate:"required"`
 }
