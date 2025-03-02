@@ -1,0 +1,28 @@
+version: "3.3"
+services:
+  db:
+    image: "postgres:16"
+    ports:
+      - "5433:5432"
+    # volumes:
+    #   - ./pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=rx
+      - POSTGRES_DB=todo
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    restart: always
+    environment:
+      - PORT=8080
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=rx
+      - DB_NAME=todo
+      - JWT_SECRET_KEY=miEqbVcpEYTAayMienvMlOkbmWnyJdFK
