@@ -130,3 +130,30 @@ func AddAddress(userId string, address *models.AddAddress) error {
 	_, err := database.RMS.Exec(query, args...)
 	return err
 }
+
+func GetAllAddress(userId string) ([]models.GetAddress, error) {
+	var address []models.GetAddress
+	query := "SELECT id, address, latitude, longitude FROM address WHERE user_id = $1 AND archived_at IS NULL"
+	err := database.RMS.Select(&address, query, userId)
+	return address, err
+}
+
+func GetSpecificAddress(userId, addressId string) (models.GetAddress, error) {
+	var address models.GetAddress
+	query := "SELECT id, address, latitude, longitude FROM address WHERE user_id = $1 AND id = $2 AND archived_at IS NULL"
+	err := database.RMS.Get(&address, query, userId, addressId)
+	return address, err
+}
+
+func UpdateAddress(userId, addressId string, address *models.UpdateAddress) error {
+	args := []interface{}{address.Address, address.Latitude, address.Longitude, userId, addressId}
+	query := "UPDATE address SET address = $1, latitude = $2, longitude = $3 WHERE user_id = $4 AND id = $5 AND archived_at IS NULL"
+	_, err := database.RMS.Exec(query, args...)
+	return err
+}
+
+func DeleteAddress(userId, addressId string) error {
+	query := "UPDATE address SET archived_at = now() WHERE user_id = $1 AND id = $2 AND archived_at IS NULL"
+	_, err := database.RMS.Exec(query, userId, addressId)
+	return err
+}

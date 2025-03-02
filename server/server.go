@@ -98,7 +98,14 @@ func SetupRoutes() *Server {
 				user.Use(middlewares.ShouldHaveRole(models.RoleUser))
 				user.Get("/profile", handlers.GetUser)
 				user.Post("/add-address", handlers.AddAddress)
-				// user.Get("/all-addresses", handlers.GetAllAddresses)
+				user.Get("/all-addresses", handlers.GetAllAddress)
+
+				user.Route("/address/{addressId}", func(addressIDRoute chi.Router) {
+					addressIDRoute.Delete("/delete-address", handlers.DeleteAddress)
+					addressIDRoute.Put("/update-address", handlers.UpdateAddress)
+					addressIDRoute.Get("/", handlers.GetSpecificAddress)
+				})
+
 				user.Get("/all-restaurants", handlers.GetAllRestaurants)
 				user.Get("/all-dishes", handlers.GetAllDishesFromAllRestaurants)
 				// user.Get("/calculate-distance", handlers.CalculateDistance)

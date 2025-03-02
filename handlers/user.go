@@ -7,6 +7,7 @@ import (
 	"rms/models"
 	"rms/utils"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/go-playground/validator/v10"
 )
 
@@ -203,6 +204,106 @@ func AddAddress(res http.ResponseWriter, req *http.Request) {
 	// return the response
 	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
 		"message": "Address added successfully",
+	})
+}
+
+func GetAllAddress(res http.ResponseWriter, req *http.Request) {
+
+	// get user id from context
+	userCtx := middlewares.UserContext(req)
+	userId := userCtx.UserId
+
+	// get address
+	address, addressErr := dbhelper.GetAllAddress(userId)
+	if addressErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, addressErr, "failed to get address")
+		return
+	}
+
+	// return the response
+	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+		"address": address,
+	})
+}
+
+func GetSpecificAddress(res http.ResponseWriter, req *http.Request) {
+
+	// get user id from context
+	userCtx := middlewares.UserContext(req)
+	userId := userCtx.UserId
+
+	// get address id
+	addressId := chi.URLParam(req, "addressId")
+
+	// get address
+	address, addressErr := dbhelper.GetSpecificAddress(userId, addressId)
+	if addressErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, addressErr, "failed to get address")
+		return
+	}
+
+	// return the response
+	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+		"address": address,
+	})
+}
+
+func UpdateAddress(res http.ResponseWriter, req *http.Request) {
+
+	// get user id from context
+	userCtx := middlewares.UserContext(req)
+	userId := userCtx.UserId
+
+	// get address id
+	addressId := chi.URLParam(req, "addressId")
+
+	// Decode the request body
+
+	var body models.UpdateAddress
+	if decodeErr := utils.DecodeJSONBody(req.Body, &body); decodeErr != nil {
+		utils.ResponseError(res, http.StatusBadRequest, decodeErr, "invalid request body")
+		return
+	}
+
+	// Validate the request body
+	v := validator.New()
+	if validationErr := v.Struct(body); validationErr != nil {
+		utils.ResponseError(res, http.StatusBadRequest, validationErr, "validation error")
+		return
+	}
+
+	// update address
+	addressErr := dbhelper.UpdateAddress(userId, addressId, &body)
+	if addressErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, addressErr, "failed to update address")
+		return
+	}
+
+	// return the response
+	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+		"message": "Address updated successfully",
+	})
+}
+
+func DeleteAddress(res http.ResponseWriter, req *http.Request) {
+
+	// get user id from context
+	userCtx := middlewares.UserContext(req)
+	userId := userCtx.UserId
+
+	// get address id
+	addressId := chi.URLParam(req, "addressId")
+
+	// delete address
+	addressErr := dbhelper.DeleteAddress(userId, addressId)
+	if addressErr != nil {
+		utils.ResponseError(res, http.StatusInternalServerError, addressErr, "failed to delete address")
+		return
+	}
+
+	// return the response
+	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+		"message": "Address deleted successfully",
 	})
 }
 

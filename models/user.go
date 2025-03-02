@@ -44,6 +44,10 @@ type GetAddress struct {
 	Address   string `json:"address" db:"address"`
 	Latitude  string `json:"latitude" db:"latitude"`
 	Longitude string `json:"longitude" db:"longitude"`
-	CreatedAt string `json:"created_at" db:"created_at"`
-	CreatedBy string `json:"created_by" db:"created_by"`
+}
+
+type UpdateAddress struct {
+	Address   string  `json:"address" db:"address" validate:"required"`
+	Latitude  float64 `json:"latitude" db:"latitude" validate:"required"`
+	Longitude float64 `json:"longitude" db:"longitude" validate:"required"`
 }
