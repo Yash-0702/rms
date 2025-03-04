@@ -99,6 +99,7 @@ func GetSpecificRestaurant(res http.ResponseWriter, req *http.Request) {
 
 	// return the response
 	utils.ResponseJSON(res, http.StatusOK, map[string]interface{}{
+
 		"restaurant": restaurant,
 	})
 
